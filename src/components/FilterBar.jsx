@@ -7,8 +7,12 @@ function FilterBar() {
   const {
     dispatch,
     handleClick,
-    state: { column, comparison, value },
+    state: { appliedFilters, column, comparison, value },
   } = useContext(PlanetsContext);
+
+  const columns = [];
+
+  appliedFilters.forEach((appliedFilter) => columns.push(appliedFilter.column));
 
   return (
     <section>
@@ -19,7 +23,9 @@ function FilterBar() {
         value={ column }
       >
         {columnOptions.map((option) => (
-          <option key={ option } value={ option }>{option}</option>
+          columns.includes(option)
+            ? null
+            : <option key={ option } value={ option }>{option}</option>
         ))}
       </select>
       <select
