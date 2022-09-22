@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PlanetsContext from '../context';
-import headers from '../helper';
+import { headers } from '../helper';
 
 function Table() {
   const { filtered } = useContext(PlanetsContext);

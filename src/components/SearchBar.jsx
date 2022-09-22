@@ -1,13 +1,15 @@
 import React, { useContext } from 'react';
 import PlanetsContext from '../context';
+import { SET_INPUT } from '../constants';
 
 function SearchBar() {
-  const { input, handleChange } = useContext(PlanetsContext);
+  const { dispatch, state: { input } } = useContext(PlanetsContext);
 
   return (
     <input
       data-testid="name-filter"
-      onChange={ handleChange }
+      onChange={ ({ target: { value } }) => (
+        dispatch({ type: SET_INPUT, payload: value })) }
       type="text"
       value={ input }
     />
