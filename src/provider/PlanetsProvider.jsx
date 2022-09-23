@@ -10,7 +10,10 @@ function PlanetsProvider({ children }) {
     comparison: 'maior que',
     column: 'population',
     input: '',
+    isSorted: false,
     planets: [],
+    sortColumn: 'population',
+    sortOrder: '',
     value: 0,
   };
 
@@ -34,94 +37,18 @@ function PlanetsProvider({ children }) {
     dispatch({ type: SET_FILTER, payload: appliedFilter });
   }
 
-  function populationFilter({ population }) {
+  function genericFilter(planet, column) {
     const filter = state.appliedFilters
-      .find((appliedFilter) => appliedFilter.column === 'population');
+      .find((appliedFilter) => appliedFilter.column === column);
 
     if (filter) {
       switch (filter.comparison) {
       case 'maior que':
-        return Number(population) > Number(filter.value);
+        return Number(planet[column]) > Number(filter.value);
       case 'menor que':
-        return Number(population) < Number(filter.value);
+        return Number(planet[column]) < Number(filter.value);
       case 'igual a':
-        return Number(population) === Number(filter.value);
-      default:
-      }
-    }
-
-    return true;
-  }
-
-  function orbitalPeriodFilter({ orbital_period: orbitalPeriod }) {
-    const filter = state.appliedFilters
-      .find((appliedFilter) => appliedFilter.column === 'orbital_period');
-
-    if (filter) {
-      switch (filter.comparison) {
-      case 'maior que':
-        return Number(orbitalPeriod) > Number(filter.value);
-      case 'menor que':
-        return Number(orbitalPeriod) < Number(filter.value);
-      case 'igual a':
-        return Number(orbitalPeriod) === Number(filter.value);
-      default:
-      }
-    }
-
-    return true;
-  }
-
-  function diameterFilter({ diameter }) {
-    const filter = state.appliedFilters
-      .find((appliedFilter) => appliedFilter.column === 'diameter');
-
-    if (filter) {
-      switch (filter.comparison) {
-      case 'maior que':
-        return Number(diameter) > Number(filter.value);
-      case 'menor que':
-        return Number(diameter) < Number(filter.value);
-      case 'igual a':
-        return Number(diameter) === Number(filter.value);
-      default:
-      }
-    }
-
-    return true;
-  }
-
-  function rotationPeriodFilter({ rotation_period: rotationPeriod }) {
-    const filter = state.appliedFilters
-      .find((appliedFilter) => appliedFilter.column === 'rotation_period');
-
-    if (filter) {
-      switch (filter.comparison) {
-      case 'maior que':
-        return Number(rotationPeriod) > Number(filter.value);
-      case 'menor que':
-        return Number(rotationPeriod) < Number(filter.value);
-      case 'igual a':
-        return Number(rotationPeriod) === Number(filter.value);
-      default:
-      }
-    }
-
-    return true;
-  }
-
-  function surfaceWaterFilter({ surface_water: surfaceWater }) {
-    const filter = state.appliedFilters
-      .find((appliedFilter) => appliedFilter.column === 'surface_water');
-
-    if (filter) {
-      switch (filter.comparison) {
-      case 'maior que':
-        return Number(surfaceWater) > Number(filter.value);
-      case 'menor que':
-        return Number(surfaceWater) < Number(filter.value);
-      case 'igual a':
-        return Number(surfaceWater) === Number(filter.value);
+        return Number(planet[column]) === Number(filter.value);
       default:
       }
     }
@@ -134,12 +61,31 @@ function PlanetsProvider({ children }) {
   }
 
   const filtered = state.planets
-    .filter(populationFilter)
-    .filter(orbitalPeriodFilter)
-    .filter(diameterFilter)
-    .filter(rotationPeriodFilter)
-    .filter(surfaceWaterFilter)
-    .filter(nameFilter);
+    .filter((planet) => genericFilter(planet, 'population'))
+    .filter((planet) => genericFilter(planet, 'orbital_period'))
+    .filter((planet) => genericFilter(planet, 'diameter'))
+    .filter((planet) => genericFilter(planet, 'rotation_period'))
+    .filter((planet) => genericFilter(planet, 'surface_water'))
+    .filter(nameFilter)
+    .sort((a, b) => {
+      if (!state.isSorted) return 0;
+
+      if (state.sortOrder === 'ASC') {
+        const aValue = a[state.sortColumn] === 'unknown'
+          ? Infinity : Number(a[state.sortColumn]);
+        const bValue = b[state.sortColumn] === 'unknown'
+          ? Infinity : Number(b[state.sortColumn]);
+
+        return aValue - bValue;
+      }
+
+      const aValue = a[state.sortColumn] === 'unknown'
+        ? -Infinity : Number(a[state.sortColumn]);
+      const bValue = b[state.sortColumn] === 'unknown'
+        ? -Infinity : Number(b[state.sortColumn]);
+
+      return bValue - aValue;
+    });
 
   return (
     <PlanetsContext.Provider value={ { dispatch, filtered, handleClick, state } }>

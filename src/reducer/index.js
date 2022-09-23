@@ -5,28 +5,33 @@ import {
   SET_COMPARISON,
   SET_FILTER,
   SET_INPUT,
+  SET_ORDER,
   SET_RESULTS,
+  SET_SORT,
+  SET_SORT_COLUMN,
   SET_VALUE,
 } from '../constants';
+
+const partialInitialState = {
+  comparison: 'maior que',
+  column: 'population',
+  value: 0,
+};
 
 function reducer(state, { payload, type }) {
   switch (type) {
   case REMOVE_FILTER:
     return {
       ...state,
+      ...partialInitialState,
       appliedFilters: state.appliedFilters.filter(({ column }) => column !== payload),
-      comparison: 'maior que',
-      column: 'population',
-      value: 0,
     };
 
   case REMOVE_FILTERS:
     return {
       ...state,
+      ...partialInitialState,
       appliedFilters: [],
-      comparison: 'maior que',
-      column: 'population',
-      value: 0,
     };
 
   case SET_COLUMN:
@@ -38,17 +43,24 @@ function reducer(state, { payload, type }) {
   case SET_FILTER:
     return {
       ...state,
+      ...partialInitialState,
       appliedFilters: [...state.appliedFilters, payload],
-      comparison: 'maior que',
-      column: 'population',
-      value: 0,
     };
 
   case SET_INPUT:
     return { ...state, input: payload };
 
+  case SET_ORDER:
+    return { ...state, isSorted: false, sortOrder: payload };
+
   case SET_RESULTS:
     return { ...state, planets: payload };
+
+  case SET_SORT:
+    return { ...state, isSorted: true };
+
+  case SET_SORT_COLUMN:
+    return { ...state, isSorted: false, sortColumn: payload };
 
   case SET_VALUE:
     return { ...state, value: payload };
